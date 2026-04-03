@@ -1,0 +1,31 @@
+# Authorizer - Sample Operations
+# Copy these lines and pipe to the backend to test
+
+# Happy path - Account created successfully
+{"account": {"active-card": true, "available-limit": 100}}
+
+# Transaction approved
+{"transaction": {"merchant": "Burger King", "amount": 20, "time": "2019-02-13T11:00:00.000Z"}}
+
+# Insufficient limit - will be rejected
+{"transaction": {"merchant": "Vivara", "amount": 150, "time": "2019-02-13T11:01:00.000Z"}}
+
+# Card not active - will be rejected
+{"account": {"active-card": false, "available-limit": 200}}
+{"transaction": {"merchant": "Nike", "amount": 50, "time": "2019-02-13T11:02:00.000Z"}}
+
+# High frequency - more than 3 transactions in 2 minutes
+{"account": {"active-card": true, "available-limit": 1000}}
+{"transaction": {"merchant": "BK1", "amount": 10, "time": "2019-02-13T11:00:00.000Z"}}
+{"transaction": {"merchant": "BK2", "amount": 10, "time": "2019-02-13T11:00:30.000Z"}}
+{"transaction": {"merchant": "BK3", "amount": 10, "time": "2019-02-13T11:01:00.000Z"}}
+{"transaction": {"merchant": "BK4", "amount": 10, "time": "2019-02-13T11:01:30.000Z"}}
+
+# Doubled transaction - same merchant and amount in 2 minutes
+{"account": {"active-card": true, "available-limit": 200}}
+{"transaction": {"merchant": "Starbucks", "amount": 15, "time": "2019-02-13T11:00:00.000Z"}}
+{"transaction": {"merchant": "Starbucks", "amount": 15, "time": "2019-02-13T11:01:00.000Z"}}
+
+# Multiple violations
+{"account": {"active-card": true, "available-limit": 50}}
+{"transaction": {"merchant": "Apple", "amount": 100, "time": "2019-02-13T11:00:00.000Z"}}

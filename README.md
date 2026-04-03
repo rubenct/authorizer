@@ -142,10 +142,10 @@ cd backend
 pip install -r requirements.txt
 
 # Run with input file
-python -m src.main < operations.txt
+python src/main.py < examples/operations.txt
 
 # Or inline
-echo '{"account": {"active-card": true, "available-limit": 100}}' | python -m src.main
+echo '{"account": {"active-card": true, "available-limit": 100}}' | python src/main.py
 
 # Run tests
 pytest
@@ -173,7 +173,35 @@ The frontend runs on `http://localhost:5173` by default.
 
 ---
 
-## 7. Evaluation Criteria
+## 7. Visual Design
+
+### Dark Fintech Aesthetic
+
+The frontend uses a dark theme inspired by executive dashboards:
+
+```
+Background:    #0a0e1a  (dark navy)
+Surface:       #111827  (card background)
+Primary:       #3b82f6  (blue)
+Success:       #10b981  (green)
+Error:         #ef4444  (red)
+Warning:       #f59e0b  (amber)
+Text Primary:  #f9fafb
+Text Muted:    #6b7280
+```
+
+### Features Implemented
+
+- **Account card** with balance and progress bar
+- **Shake animation** on violations
+- **Slide+fade** entrance for log entries
+- **Time Window Visualizer** showing the 2-minute sliding window
+- **Color transitions** on balance (green → yellow → red)
+- **Dark theme** with monospace typography for numbers
+
+---
+
+## 8. Evaluation Criteria
 
 ### Functional
 - [x] All spec I/O examples produce the correct output

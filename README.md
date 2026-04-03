@@ -232,3 +232,5 @@ Text Muted:    #6b7280
 ---
 
 **Author:** Ruben Cariño
+
+> Built with React + Python

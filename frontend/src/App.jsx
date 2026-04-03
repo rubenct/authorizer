@@ -29,44 +29,48 @@ const colors = {
 };
 
 function TimeWindowViz({ transactions }) {
-  const now = new Date();
+  const [now, setNow] = useState(new Date());
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setNow(new Date());
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
   const windowStart = new Date(now.getTime() - 2 * 60000);
   const recentTxns = transactions.filter(t => new Date(t.time) >= windowStart);
-  const atRisk = recentTxns.length >= 2;
+  const atRisk = recentTxns.length >= 3;
 
   return (
     <div style={{ ...cardStyle, marginTop: 12 }}>
       <h4 style={{ fontSize: 14, fontWeight: 700, color: colors.textPrimary, marginBottom: 8 }}>⏱️ Time Window (2 min)</h4>
       <div style={{ 
         height: 24, 
-        background: 'var(--border-color)', 
+        background: colors.border, 
         borderRadius: 6, 
         position: 'relative',
         overflow: 'hidden'
       }}>
-        <div style={{
-          position: 'absolute',
-          left: 0,
-          top: 0,
-          bottom: 0,
-          width: '30%',
-          background: 'rgba(59, 130, 246, 0.2)',
-          borderRight: '1px dashed var(--border-color)'
-        }} />
-        {recentTxns.map((t, i) => (
-          <div key={i} style={{
-            position: 'absolute',
-            left: `${10 + i * 25}%`,
-            top: 4,
-            width: 12,
-            height: 16,
-            background: colors.primary,
-            borderRadius: 3
-          }} />
-        ))}
+        {recentTxns.map((t, i) => {
+          const txnTime = new Date(t.time).getTime();
+          const percent = Math.max(0, Math.min(100, ((txnTime - windowStart.getTime()) / 120000) * 100));
+          return (
+            <div key={i} style={{
+              position: 'absolute',
+              left: `${percent}%`,
+              top: 4,
+              width: 10,
+              height: 16,
+              background: colors.success,
+              borderRadius: 3,
+              transform: 'translateX(-50%)'
+            }} />
+          );
+        })}
       </div>
-      <p style={{ fontSize: 12, color: atRisk ? colors.warning : colors.textMuted, marginTop: 6 }}>
-        {recentTxns.length}/3 transactions • {atRisk ? '⚠️ Next will trigger violation!' : '✅ Safe'}
+      <p style={{ fontSize: 12, color: atRisk ? colors.error : colors.textMuted, marginTop: 6 }}>
+        {recentTxns.length}/3 transactions • {atRisk ? '⚠️ Next will trigger!' : '✅ Safe'}
       </p>
     </div>
   );
@@ -80,6 +84,7 @@ function App() {
   const [showHelp, setShowHelp] = useState(false);
   const [viewMode, setViewMode] = useState('initial');
   const [shake, setShake] = useState(false);
+  const [displayLimit, setDisplayLimit] = useState(0);
   const logEndRef = useRef(null);
 
   useEffect(() => {
@@ -93,15 +98,27 @@ function App() {
     logEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [log]);
 
+  useEffect(() => {
+    if (account) {
+      setTimeout(() => {
+        setDisplayLimit(account.availableLimit);
+      }, 50);
+    } else {
+      setDisplayLimit(0);
+    }
+  }, [account?.availableLimit]);
+
   const handleReset = () => {
     reset();
     setViewMode('initial');
+    setDisplayLimit(0);
   };
   
   const handleCreate = () => { 
     reset();
     createAccount(true, 100); 
     setViewMode('high-level');
+    setDisplayLimit(100);
   };
   
   const handleJsonInitial = () => { 
@@ -125,7 +142,7 @@ function App() {
         ? colors.warning 
         : colors.error;
 
-  const balancePercent = account ? (account.availableLimit / 100) * 100 : 0;
+  const balancePercent = account ? Math.min((displayLimit / 100) * 100, 100) : 0;
 
   return (
     <div style={{ minHeight: '100vh', background: colors.bgPrimary, color: colors.textPrimary, padding: 16, fontFamily: 'DM Sans, sans-serif' }}>
@@ -176,13 +193,13 @@ function App() {
             {!account 
               ? <p style={{ color: colors.textMuted, fontSize: 16 }}>No account</p> 
               : <>
-                <p style={{ fontSize: 36, fontWeight: 700, color: balanceColor, margin: '8px 0', fontFamily: 'JetBrains Mono, monospace' }}>${account.availableLimit}</p>
-                <div style={{ height: 6, background: 'var(--border-color)', borderRadius: 3, overflow: 'hidden' }}>
-                  <div style={{ 
-                    width: `${Math.min(balancePercent, 100)}%`, 
+                <p style={{ fontSize: 36, fontWeight: 700, color: balanceColor, margin: '8px 0', fontFamily: 'JetBrains Mono, monospace' }}>${displayLimit || account?.availableLimit || 0}</p>
+                <div style={{ height: 6, background: colors.border, borderRadius: 3, overflow: 'hidden' }}>
+                  <div key={displayLimit} style={{ 
+                    width: `${balancePercent}%`, 
                     height: '100%', 
                     background: balanceColor,
-                    transition: 'width 0.3s ease, background 0.3s ease'
+                    transition: 'width 0.5s ease-out'
                   }} />
                 </div>
               </>

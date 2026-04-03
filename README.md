@@ -228,3 +228,7 @@ Text Muted:    #6b7280
 ### Documentation
 - [x] Complete README with execution instructions
 - [x] Architectural decisions justified
+
+---
+
+**Author:** Ruben Cariño

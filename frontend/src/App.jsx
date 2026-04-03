@@ -13,7 +13,6 @@ function App() {
   const { account, transactions, log, violations, createAccount, authorizeTransaction, reset, loadScenario, process } = useAuthorizer();
   const [merchant, setMerchant] = useState('');
   const [amount, setAmount] = useState('');
-  const [rawMode, setRawMode] = useState(false);
   const [jsonInput, setJsonInput] = useState('');
   const [showHelp, setShowHelp] = useState(false);
   const [viewMode, setViewMode] = useState('initial');
@@ -39,15 +38,6 @@ function App() {
       setJsonInput(''); 
     }
   };
-
-  const handleJson = () => { if (jsonInput) { 
-    try { 
-      const op = JSON.parse(jsonInput); 
-      if (op.transaction?.time) op.transaction.time = new Date(op.transaction.time);
-      process(op); 
-    } catch {} 
-    setJsonInput(''); 
-  }};
 
   const handleTx = () => { if (merchant && amount) { authorizeTransaction(merchant, parseInt(amount,10), new Date()); setMerchant(''); setAmount(''); }};
 
@@ -137,21 +127,10 @@ function App() {
           {viewMode === 'high-level' && (
             <>
               <div style={cardStyle}>
-                {rawMode ? (
-                  <>
-                    <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 12, color: '#1f2937' }}>📝 Raw JSON</h3>
-                    <textarea value={jsonInput} onChange={e => setJsonInput(e.target.value)} placeholder='{"transaction":{"merchant":"BK","amount":20}}' style={{ width: '100%', height: 80, background: '#fff', border: '2px solid #d1d5db', borderRadius: 8, color: '#111827', fontFamily: 'monospace', fontSize: 14 }} />
-                    <button type="button" onClick={handleJson} style={{ marginTop: 12, width: '100%', padding: 14, background: '#3b82f6', color: 'white', border: 'none', borderRadius: 10, fontWeight: 600, fontSize: 16 }}>▶ Run</button>
-                  </>
-                ) : (
-                  <>
-                    <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 12, color: '#1f2937' }}>💸 New Transaction</h3>
-                    <input value={merchant} onChange={e => setMerchant(e.target.value)} placeholder="Merchant name" style={{ width: '100%', padding: 12, marginBottom: 10, background: '#fff', border: '2px solid #d1d5db', borderRadius: 10, color: '#111827', fontSize: 16 }} />
-                    <input value={amount} onChange={e => setAmount(e.target.value)} placeholder="Amount" type="number" style={{ width: '100%', padding: 12, marginBottom: 10, background: '#fff', border: '2px solid #d1d5db', borderRadius: 10, color: '#111827', fontSize: 16 }} />
-                    <button type="button" onClick={handleTx} style={{ width: '100%', padding: 14, background: '#3b82f6', color: 'white', border: 'none', borderRadius: 10, fontWeight: 600, fontSize: 16 }}>Authorize</button>
-                  </>
-                )}
-                <button type="button" onClick={() => setRawMode(!rawMode)} style={{ marginTop: 12, width: '100%', padding: 10, background: '#fff', border: '2px solid #d1d5db', borderRadius: 10, color: '#6b7280', fontSize: 14 }}>{rawMode ? '← Form Mode' : 'Raw JSON Mode →'}</button>
+                <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 12, color: '#1f2937' }}>💸 New Transaction</h3>
+                <input value={merchant} onChange={e => setMerchant(e.target.value)} placeholder="Merchant name" style={{ width: '100%', padding: 12, marginBottom: 10, background: '#fff', border: '2px solid #d1d5db', borderRadius: 10, color: '#111827', fontSize: 16 }} />
+                <input value={amount} onChange={e => setAmount(e.target.value)} placeholder="Amount" type="number" style={{ width: '100%', padding: 12, marginBottom: 10, background: '#fff', border: '2px solid #d1d5db', borderRadius: 10, color: '#111827', fontSize: 16 }} />
+                <button type="button" onClick={handleTx} style={{ width: '100%', padding: 14, background: '#3b82f6', color: 'white', border: 'none', borderRadius: 10, fontWeight: 600, fontSize: 16 }}>Authorize</button>
               </div>
 
               <div style={cardStyle}>

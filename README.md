@@ -22,10 +22,10 @@
 
 The **Authorizer** project is a bank transaction authorization system. Its goal is to decide in real time whether a transaction should be approved or rejected based on a set of predefined business rules.
 
-| Part | Description | Purpose |
-|---|---|---|
-| **Backend** | CLI application that receives operations via `stdin` and emits results via `stdout` | Fulfill the original technical challenge |
-| **Frontend** | Interactive React dashboard that visualizes the authorizer in real time | Visual demo for portfolio |
+| Part         | Description                                                                         | Purpose                                  |
+| ------------ | ----------------------------------------------------------------------------------- | ---------------------------------------- |
+| **Backend**  | CLI application that receives operations via `stdin` and emits results via `stdout` | Fulfill the original technical challenge |
+| **Frontend** | Interactive React dashboard that visualizes the authorizer in real time             | Visual demo for portfolio                |
 
 Both parts share the **same domain logic**. The authorizer core is framework-agnostic: reusable in both Python (CLI) and JavaScript (React).
 
@@ -35,23 +35,26 @@ Both parts share the **same domain logic**. The authorizer core is framework-agn
 
 ### SOLID
 
-| Principle | Application in this project |
-|---|---|
+| Principle                     | Application in this project                                                                                   |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------- |
 | **S** — Single Responsibility | Each module/class/function has a single reason to change. Validators, state, and parser are separate modules. |
-| **O** — Open/Closed | The validation system is open for extension (adding new rules) without modifying existing code. |
-| **L** — Liskov Substitution | Abstractions are substitutable. A new validator can be added to the pipeline without breaking anything. |
-| **I** — Interface Segregation | Do not force unnecessary dependencies. State knows nothing about validators, and vice versa. |
-| **D** — Dependency Inversion | High-level modules (handler) depend on abstractions, not on concrete validators. |
+| **O** — Open/Closed           | The validation system is open for extension (adding new rules) without modifying existing code.               |
+| **L** — Liskov Substitution   | Abstractions are substitutable. A new validator can be added to the pipeline without breaking anything.       |
+| **I** — Interface Segregation | Do not force unnecessary dependencies. State knows nothing about validators, and vice versa.                  |
+| **D** — Dependency Inversion  | High-level modules (handler) depend on abstractions, not on concrete validators.                              |
 
 ### KISS — Keep It Simple, Stupid
+
 - Do not add unnecessary frameworks, layers, or abstractions.
 - If something can be solved with the stdlib, use it.
 
 ### DRY — Don't Repeat Yourself
+
 - Business rule logic exists in **one place only**: the core.
 - The frontend does not reimplement rules; it consumes the core.
 
 ### Referential Transparency
+
 - Validator functions are **pure functions**: given the same input, they always produce the same output with no side effects.
 - Mutable state is isolated in a single layer (the Store/State).
 
@@ -66,27 +69,37 @@ A command-line application written in **Python 3.11+** that processes a stream o
 ### Operations
 
 **Account Creation:**
+
 ```json
-{"account": {"active-card": true, "available-limit": 100}}
+{ "account": { "active-card": true, "available-limit": 100 } }
 ```
+
 **Output:** `{"account": {"active-card": true, "available-limit": 100}, "violations": []}`
 
 **Transaction Authorization:**
+
 ```json
-{"transaction": {"merchant": "Burger King", "amount": 20, "time": "2019-02-13T10:00:00.000Z"}}
+{
+  "transaction": {
+    "merchant": "Burger King",
+    "amount": 20,
+    "time": "2019-02-13T10:00:00.000Z"
+  }
+}
 ```
+
 **Output:** `{"account": {"active-card": true, "available-limit": 80}, "violations": []}`
 
 ### Business Rules
 
-| ID | Description | Violation |
-|---|---|---|
-| AC-01 | Only one account can be created. | `account-already-initialized` |
-| TR-01 | An initialized account must exist. | `account-not-initialized` |
-| TR-02 | The account card must be active. | `card-not-active` |
-| TR-03 | The transaction amount must not exceed the available limit. | `insufficient-limit` |
-| TR-04 | No more than 3 approved transactions within a 2-minute interval. | `high-frequency-small-interval` |
-| TR-05 | No more than 1 transaction with the same merchant and amount within a 2-minute interval. | `doubled-transaction` |
+| ID    | Description                                                                              | Violation                       |
+| ----- | ---------------------------------------------------------------------------------------- | ------------------------------- |
+| AC-01 | Only one account can be created.                                                         | `account-already-initialized`   |
+| TR-01 | An initialized account must exist.                                                       | `account-not-initialized`       |
+| TR-02 | The account card must be active.                                                         | `card-not-active`               |
+| TR-03 | The transaction amount must not exceed the available limit.                              | `insufficient-limit`            |
+| TR-04 | No more than 3 approved transactions within a 2-minute interval.                         | `high-frequency-small-interval` |
+| TR-05 | No more than 1 transaction with the same merchant and amount within a 2-minute interval. | `doubled-transaction`           |
 
 ---
 
@@ -94,13 +107,13 @@ A command-line application written in **Python 3.11+** that processes a stream o
 
 ### Tech Stack
 
-| Tool | Purpose |
-|---|---|
-| **React 18** | UI framework |
-| **Vite** | Build tool and dev server |
-| **Tailwind CSS** | Utility-first styling |
+| Tool              | Purpose                    |
+| ----------------- | -------------------------- |
+| **React 18**      | UI framework               |
+| **Vite**          | Build tool and dev server  |
+| **Tailwind CSS**  | Utility-first styling      |
 | **Framer Motion** | Animations and transitions |
-| **Lucide React** | Iconography |
+| **Lucide React**  | Iconography                |
 
 ### Features
 
@@ -204,21 +217,25 @@ Text Muted:    #6b7280
 ## 8. Evaluation Criteria
 
 ### Functional
+
 - [x] All spec I/O examples produce the correct output
 - [x] Edge cases covered and working
 - [x] The frontend faithfully reflects the backend behavior
 
 ### Code Quality
+
 - [x] Each validator is a pure function (referential transparency)
 - [x] Adding a new rule does not require modifying the orchestrator
 - [x] No business logic inside React components
 - [x] Mutable state is isolated in a single layer
 
 ### Testing
+
 - [x] One unit test per business rule
 - [x] Integration tests for all spec flows
 
 ### Frontend (portfolio)
+
 - [x] The UI is functional and intuitive without reading documentation
 - [x] Raw JSON Mode works correctly
 - [x] Predefined scenarios load and run correctly
@@ -226,9 +243,11 @@ Text Muted:    #6b7280
 - [x] The design is responsive
 
 ### Documentation
+
 - [x] Complete README with execution instructions
 - [x] Architectural decisions justified
 
 ---
 
-**Author:** Ruben Cariño
+**Author:** Ruben Cariño T
+
